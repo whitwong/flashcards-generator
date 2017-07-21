@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="us-en">
+<head>
+	<meta charset="UTF-8">
+	<title>Flashcard Front End</title>
+  <!--Stylesheets: Bootstrap, Local-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.0/css/materialize.min.css">
+  <link rel="stylesheet" type="text/css" href="/public/css/styles.css">
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans|Monoton|Julius+Sans+One" rel="stylesheet">
+  <!--Script tags for javascript/jquery libraries-->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.0/js/materialize.min.js"></script>
+</head>
+
+<body>
+	<!-- Title -->
+	<div class="row jumbotron">
+		<div class="col-md-12">
+			<h1>Flashcard Generator</h1>
+		</div>
+	</div>
+
+	<!-- User Input for Flashcards -->
+	<!-- Basic Cards -->
+	<div class="row">
+		<div class="col-md-6 basic-section" id="basic-section">
+			<h3>Basic Flashcards</h3>
+			<div>
+				<div>Enter information for card front:</div>
+				<input type="text" class="form-control" id="front" placeholder="What is the popular drink to order when you're at the Three Broomsticks in Hogsmeade?" onfocus="this.placeholder = ''" onblur="this.placeholder='What information do you want for the card front?'">
+				<div>Enter information for card back:</div>
+				<input type="text" class="form-control" id="back" placeholder="Butterbeer" onfocus="this.placeholder = ''" onblur="this.placeholder='What information do you want for the card back?'">
+				<div><button type="submit" class="btn btn-primary btn-md waves-effect waves-light" id="basic-submit">Basic Card Submit</button></div>
+			</div>
+		</div>
+		
+		<!-- Cloze Cards -->
+		<div class="col-md-6" id="cloze-section">
+			<h3>Cloze Flashcards</h3>
+			<div>
+				<div>Enter full text of card:</div>
+				<input type="text" class="form-control" id="full" placeholder="Harry Potter's best friends are Ron Weasley and Hermione Granger." onfocus="this.placeholder = ''" onblur="this.placeholder='What information do you want for the card front?'">
+				<div>Enter cloze text (replacement text):</div>
+				<input type="text" class="form-control" id="cloze" placeholder="Ron Weasley" onfocus="this.placeholder = ''" onblur="this.placeholder='What information do you want to replace?'">
+				<div><button type="submit" class="btn btn-primary btn-md waves-effect waves-light" id="cloze-submit">Cloze Card Submit</button></div>
+			</div>
+		</div>
+	</div>
+	<hr>
+
+	<!-- Display new flashcards here -->
+	<div class="row flashcards">
+		<div class="col-md-6 basic-section">
+			<h3>Basic Cards</h3>
+			<div class="row" id="basic-card"></div>
+		</div>
+
+		<div class="col-md-6">
+			<h3>Cloze Cards</h3>
+			<div class="row" id="cloze-card"></div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="col-md-12">
+			<p><a href="/api/basic">Basic Card Data</a> | <a href="/api/cloze">Cloze Card Data</a></p>
+		</div>
+	</footer>
+	<!--Local JavaScript-->
+	<script src="/public/javascript/main.js"></script>
+</body>
+</html>
+
+<script>
+/*******On-click event to create a Basic Card*******/
+$("#basic-submit").on("click", function(event){
+	event.preventDefault();
+	//Validate user input
+	function validateInput(){
+		var isValid = true;
+		if (($("#front").val() === "") || ($("#back").val() === "")){
+			isValid = false;
+		}
+		return isValid;
+	}
+
+	//Post data for basic card
+	if (validateInput() == true){
+		//Clear Basic Cards area before appending new cards
+		$("#basic-card").empty();
+		//Assign front and back information to a new basic card variable
+		var basicCard = {
+			front: $("#front").val().trim(),
+			back: $("#back").val().trim()
+		}
+		//Post information to server and return new card to page
+		var currentURL = window.location.origin;
+		$.post(currentURL + "/api/basic", basicCard, function(data){
+			for(var i=0; i<data.length; i++){
+				$("#basic-card").append(
+					"<section class='contain'>"+
+						"<div style='background:#ee6e73;' class='card'>"+
+							"<figure class='front'>"+data[i].front+"</figure>"+
+							"<figure style='color:#F1F1B7;' class='back'>"+data[i].back+"</figure>"+
+						"</div>"+
+					"</section>");
+			};
+			//Clear form inputs
+			$("#front").val("");
+			$("#back").val("");
+		});
+	}
+});
+
+/*******On-click event to create a Cloze Card*******/
+//Post data for cloze card
+$("#cloze-submit").on("click", function(event){
+	event.preventDefault();
+	//Validate user input
+	function validateInput(){
+		var isValid = true;
+		if (($("#full").val() === "") || ($("#cloze").val() === "")){
+			isValid = false;
+		}
+		return isValid;
+	}
+
+	//Post data for cloze card
+	if (validateInput() == true){
+		//Clear Cloze Cards area before appending new cards
+		$("#cloze-card").empty();
+		//Assign front and back information to a new basic card variable
+		var clozeCard = {
+			fullText: $("#full").val().trim(),
+			cloze: $("#cloze").val().trim()
+		}
+		//Post information to server and return new card to page
+		var currentURL = window.location.origin;
+		$.post(currentURL + "/api/cloze", clozeCard, function(data){
+			for(var i=0; i<data.length; i++){
+				$("#cloze-card").append(
+				"<section class='contain'>"+
+					"<div class='card blue-grey darken-1'>"+
+						"<figure class='front'>"+data[i].partial+"</figure>"+
+						"<figure style='color:#ffab40;' class='back'>"+data[i].cloze+"</figure>"+
+					"</div>"+
+				"</section>");
+			}
+			//Clear form inputs
+			$("#full").val("");
+			$("#cloze").val("");
+		});
+	}
+});
+
+/*******GET request to create flashcards already stored*******/
+// Basic Cards
+$.get("/api/basic", function(data){
+	for (var i=0; i<data.length; i++){
+		$("#basic-card").append(
+			"<section class='contain'>"+
+				"<div style='background:#ee6e73;' class='card'>"+
+					"<figure class='front'>"+data[i].front+"</figure>"+
+					"<figure style='color:#F1F1B7;'class='back'>"+data[i].back+"</figure>"+
+				"</div>"+
+			"</section>");
+	};
+});
+// Cloze Cards
+$.get("api/cloze", function(data){
+	for(var i=0; i<data.length; i++){
+		$("#cloze-card").append(
+			"<section class='contain'>"+
+				"<div class='card blue-grey darken-1'>"+
+					"<figure class='front'>"+data[i].partial+"</figure>"+
+					"<figure style='color:#ffab40;' class='back'>"+data[i].cloze+"</figure>"+
+				"</div>"+
+			"</section>");
+	}
+});
+</script>

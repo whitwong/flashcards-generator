@@ -1,0 +1,67 @@
+/*Header Styles*/
+h1 {
+	text-align: center;
+}
+h3 {
+	font-family: 'Julius Sans One', sans-serif;
+}
+.jumbotron {
+	background: #887B75;
+	color: white;
+}
+.jumbotron h1 {
+	font-size: 5.5em;
+	font-family: 'Monoton', cursive;
+}
+
+/*User Input Section*/
+#basic-submit, #cloze-submit{
+	outline: none;
+}
+.basic-section {
+	border-right: 1px solid #9e9e9e;
+}
+#basic-section, #cloze-section {
+	padding-left: 80px;
+	padding-right: 80px;
+}
+hr {
+	border-top: 1px solid #9e9e9e;
+}
+
+/*Generated Cards Styles*/
+.flashcards h3 {
+	margin-left: 20px;
+}
+.card {
+	cursor: pointer;
+	transform-style: preserve-3d;
+	transition: transform .5s;
+	float: left;
+	height: 250px;
+	width: 250px;
+	margin: 20px;
+	font-family: 'Droid Sans', sans-serif;
+	font-size: 1.2em;
+}
+.card figure {
+	backface-visibility: hidden;
+}
+.card .front {
+	position: absolute;
+	padding-top: 15%;
+	color: white;
+}
+.card .back {
+	font-size: 1.7em;
+	font-weight: bold;
+	text-align: center;
+	padding-top: 20%;
+	transform: rotateY(180deg);
+}
+.card.flipped {
+	transform: rotateY(180deg);
+}
+.footer {
+	margin-left: 20px;
+}
